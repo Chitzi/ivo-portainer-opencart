@@ -6,3 +6,6 @@ ALTER TABLE `oc_cart`
   MODIFY COLUMN `quantity` int(5) NOT NULL DEFAULT 0,
   MODIFY COLUMN `override` text NOT NULL,
   MODIFY COLUMN `price` decimal(15,4) NOT NULL DEFAULT 0.0000;
+
+ALTER TABLE `oc_theme`
+  ADD COLUMN IF NOT EXISTS `status` tinyint(1) NOT NULL DEFAULT 0 AFTER `code`;
