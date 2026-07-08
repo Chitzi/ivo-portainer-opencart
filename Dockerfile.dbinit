@@ -1,0 +1,3 @@
+FROM bitnami/mariadb:latest
+
+COPY dump.sql /dump.sql

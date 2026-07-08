@@ -1,0 +1,56 @@
+services:
+  opencart:
+    image: ghcr.io/chitzi/ivo-portainer-opencart:latest
+    container_name: portainer_opencart_demo
+    ports:
+      - "8090:80"
+    environment:
+      OPENCART_HOST: ${OPENCART_HOST:-localhost}
+      OPENCART_PORT: ${OPENCART_PORT:-:8090}
+      OPENCART_DATABASE_HOST: mariadb_opencart_demo
+      OPENCART_DATABASE_USER: bn_opencart
+      OPENCART_DATABASE_PASSWORD: ""
+      OPENCART_DATABASE_NAME: bitnami_opencart
+    volumes:
+      - opencart_demo_data:/var/www/html
+    depends_on:
+      - mariadb_opencart_demo
+    restart: unless-stopped
+
+  mariadb_opencart_demo:
+    image: bitnami/mariadb:latest
+    container_name: portainer_opencart_demo_db
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      MARIADB_USER: bn_opencart
+      MARIADB_DATABASE: bitnami_opencart
+    volumes:
+      - mariadb_opencart_demo_data:/bitnami/mariadb
+    restart: unless-stopped
+
+  opencart_admin_ready:
+    image: ghcr.io/chitzi/ivo-portainer-opencart-dbinit:latest
+    container_name: portainer_opencart_demo_admin_ready
+    depends_on:
+      - opencart
+      - mariadb_opencart_demo
+    command:
+      - /bin/bash
+      - -ec
+      - |
+        until mariadb --skip-ssl -h mariadb_opencart_demo -u bn_opencart bitnami_opencart -e "SELECT 1;" >/dev/null 2>&1; do
+          sleep 2
+        done
+        if ! mariadb --skip-ssl -h mariadb_opencart_demo -u bn_opencart bitnami_opencart -e "SELECT 1 FROM oc_store LIMIT 1;" >/dev/null 2>&1; then
+          mariadb --skip-ssl -h mariadb_opencart_demo -u bn_opencart bitnami_opencart < /dump.sql
+        fi
+        until mariadb --skip-ssl -h mariadb_opencart_demo -u bn_opencart bitnami_opencart -e "SELECT 1 FROM oc_user LIMIT 1;" >/dev/null 2>&1; do
+          sleep 2
+        done
+        mariadb --skip-ssl -h mariadb_opencart_demo -u bn_opencart bitnami_opencart -e "UPDATE oc_user SET username='admin', password=CONCAT(CHAR(36),'2y',CHAR(36),'12',CHAR(36),'aEvP0qBFmE0I2nxKXwUL6u5dI5NTt48dTzZz8G6t8yuSGvW3tGcC2'), firstname='Demo', lastname='Admin', email='admin@example.com', status=1 WHERE user_id=1;"
+        echo "OpenCart demo is ready: http://localhost:8090/admin admin/admin123"
+    restart: "no"
+
+volumes:
+  opencart_demo_data:
+  mariadb_opencart_demo_data:
