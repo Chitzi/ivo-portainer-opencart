@@ -5,6 +5,7 @@ ENV OPENCART_VER=4.1.0.3
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         curl \
+        default-mysql-client \
         libfreetype6-dev \
         libjpeg-dev \
         libpng-dev \
@@ -21,6 +22,8 @@ RUN apt-get update \
     && chown -R www-data:www-data /var/www/html \
     && rm -rf /var/lib/apt/lists/* /tmp/opencart /tmp/opencart.zip
 
+COPY dump.sql /dump.sql
+COPY db-patch.sql /db-patch.sql
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 

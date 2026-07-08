@@ -93,4 +93,22 @@ while ! timeout 2 bash -c "</dev/tcp/${OPENCART_DATABASE_HOST}/3306" 2>/dev/null
     sleep 2
 done
 
+echo "Waiting for OpenCart database login..."
+until mysql --skip-ssl -h "${OPENCART_DATABASE_HOST}" -u "${OPENCART_DATABASE_USER}" "${OPENCART_DATABASE_NAME}" -e "SELECT 1;" >/dev/null 2>&1; do
+    sleep 2
+done
+
+if ! mysql --skip-ssl -h "${OPENCART_DATABASE_HOST}" -u "${OPENCART_DATABASE_USER}" "${OPENCART_DATABASE_NAME}" -e "SELECT 1 FROM oc_store LIMIT 1;" >/dev/null 2>&1; then
+    echo "Importing bundled OpenCart demo database..."
+    mysql --skip-ssl -h "${OPENCART_DATABASE_HOST}" -u "${OPENCART_DATABASE_USER}" "${OPENCART_DATABASE_NAME}" < /dump.sql
+fi
+
+echo "Reconciling OpenCart demo database schema..."
+mysql --skip-ssl -h "${OPENCART_DATABASE_HOST}" -u "${OPENCART_DATABASE_USER}" "${OPENCART_DATABASE_NAME}" < /db-patch.sql
+
+echo "Setting demo admin login..."
+mysql --skip-ssl -h "${OPENCART_DATABASE_HOST}" -u "${OPENCART_DATABASE_USER}" "${OPENCART_DATABASE_NAME}" -e "UPDATE oc_user SET username='admin', password=CONCAT(CHAR(36),'2y',CHAR(36),'12',CHAR(36),'aEvP0qBFmE0I2nxKXwUL6u5dI5NTt48dTzZz8G6t8yuSGvW3tGcC2'), firstname='Demo', lastname='Admin', email='admin@example.com', status=1 WHERE user_id=1;"
+
+echo "OpenCart demo is ready: http://${OPENCART_HOST}${OPENCART_PORT}/admin admin/admin123"
+
 exec docker-php-entrypoint "$@"
