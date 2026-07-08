@@ -6,6 +6,7 @@ services:
       - "8090:80"
     environment:
       OPENCART_PUBLIC_URL: ${OPENCART_PUBLIC_URL:-https://demo-oc.ivo.md}
+      OPENCART_RESET_DEMO: ${OPENCART_RESET_DEMO:-0}
       OPENCART_DATABASE_HOST: mariadb_opencart_demo
       OPENCART_DATABASE_USER: bn_opencart
       OPENCART_DATABASE_PASSWORD: ""

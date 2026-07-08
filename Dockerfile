@@ -20,6 +20,8 @@ RUN apt-get update \
     && mv /var/www/html/config-dist.php /var/www/html/config.php \
     && mv /var/www/html/admin/config-dist.php /var/www/html/admin/config.php \
     && chown -R www-data:www-data /var/www/html \
+    && mkdir -p /opt/opencart-pristine \
+    && cp -a /var/www/html/. /opt/opencart-pristine/ \
     && rm -rf /var/lib/apt/lists/* /tmp/opencart /tmp/opencart.zip
 
 COPY dump.sql /dump.sql

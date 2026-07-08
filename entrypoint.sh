@@ -11,6 +11,40 @@ OPENCART_DATABASE_HOST="${OPENCART_DATABASE_HOST:-mariadb_opencart_demo}"
 OPENCART_DATABASE_USER="${OPENCART_DATABASE_USER:-bn_opencart}"
 OPENCART_DATABASE_PASSWORD="${OPENCART_DATABASE_PASSWORD:-}"
 OPENCART_DATABASE_NAME="${OPENCART_DATABASE_NAME:-bitnami_opencart}"
+OPENCART_RESET_DEMO="${OPENCART_RESET_DEMO:-0}"
+
+mysql_args() {
+    local args=(--skip-ssl -h "${OPENCART_DATABASE_HOST}" -u "${OPENCART_DATABASE_USER}")
+
+    if [ -n "${OPENCART_DATABASE_PASSWORD}" ]; then
+        args+=("-p${OPENCART_DATABASE_PASSWORD}")
+    fi
+
+    args+=("${OPENCART_DATABASE_NAME}")
+    printf '%s\n' "${args[@]}"
+}
+
+run_mysql() {
+    mapfile -t args < <(mysql_args)
+    mysql "${args[@]}" "$@"
+}
+
+restore_demo_files() {
+    echo "Resetting OpenCart files from bundled demo image..."
+    find /var/www/html -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+    cp -a /opt/opencart-pristine/. /var/www/html/
+    chown -R www-data:www-data /var/www/html
+}
+
+reset_demo_database() {
+    echo "Resetting OpenCart database from bundled demo dump..."
+    run_mysql -Nse "SET FOREIGN_KEY_CHECKS=0; SELECT CONCAT('DROP ', IF(TABLE_TYPE = 'VIEW', 'VIEW', 'TABLE'), ' IF EXISTS \`', TABLE_NAME, '\`;') FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE(); SET FOREIGN_KEY_CHECKS=1;" | run_mysql
+    run_mysql < /dump.sql
+}
+
+if [ "${OPENCART_RESET_DEMO}" = "1" ] || [ "${OPENCART_RESET_DEMO}" = "true" ]; then
+    restore_demo_files
+fi
 
 generate_config() {
 cat <<EOF > "$CONFIG_FILE"
@@ -95,20 +129,22 @@ while ! timeout 2 bash -c "</dev/tcp/${OPENCART_DATABASE_HOST}/3306" 2>/dev/null
 done
 
 echo "Waiting for OpenCart database login..."
-until mysql --skip-ssl -h "${OPENCART_DATABASE_HOST}" -u "${OPENCART_DATABASE_USER}" "${OPENCART_DATABASE_NAME}" -e "SELECT 1;" >/dev/null 2>&1; do
+until run_mysql -e "SELECT 1;" >/dev/null 2>&1; do
     sleep 2
 done
 
-if ! mysql --skip-ssl -h "${OPENCART_DATABASE_HOST}" -u "${OPENCART_DATABASE_USER}" "${OPENCART_DATABASE_NAME}" -e "SELECT 1 FROM oc_store LIMIT 1;" >/dev/null 2>&1; then
+if [ "${OPENCART_RESET_DEMO}" = "1" ] || [ "${OPENCART_RESET_DEMO}" = "true" ]; then
+    reset_demo_database
+elif ! run_mysql -e "SELECT 1 FROM oc_store LIMIT 1;" >/dev/null 2>&1; then
     echo "Importing bundled OpenCart demo database..."
-    mysql --skip-ssl -h "${OPENCART_DATABASE_HOST}" -u "${OPENCART_DATABASE_USER}" "${OPENCART_DATABASE_NAME}" < /dump.sql
+    run_mysql < /dump.sql
 fi
 
 echo "Reconciling OpenCart demo database schema..."
-mysql --skip-ssl -h "${OPENCART_DATABASE_HOST}" -u "${OPENCART_DATABASE_USER}" "${OPENCART_DATABASE_NAME}" < /db-patch.sql
+run_mysql < /db-patch.sql
 
 echo "Setting demo admin login..."
-mysql --skip-ssl -h "${OPENCART_DATABASE_HOST}" -u "${OPENCART_DATABASE_USER}" "${OPENCART_DATABASE_NAME}" -e "UPDATE oc_user SET username='admin', password=CONCAT(CHAR(36),'2y',CHAR(36),'12',CHAR(36),'aEvP0qBFmE0I2nxKXwUL6u5dI5NTt48dTzZz8G6t8yuSGvW3tGcC2'), firstname='Demo', lastname='Admin', email='admin@example.com', status=1 WHERE user_id=1;"
+run_mysql -e "UPDATE oc_user SET username='admin', password=CONCAT(CHAR(36),'2y',CHAR(36),'12',CHAR(36),'aEvP0qBFmE0I2nxKXwUL6u5dI5NTt48dTzZz8G6t8yuSGvW3tGcC2'), firstname='Demo', lastname='Admin', email='admin@example.com', status=1 WHERE user_id=1;"
 
 echo "OpenCart demo is ready: ${OPENCART_PUBLIC_URL}/admin admin/admin123"
 
