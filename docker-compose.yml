@@ -5,8 +5,7 @@ services:
     ports:
       - "8090:80"
     environment:
-      OPENCART_HOST: ${OPENCART_HOST:-localhost}
-      OPENCART_PORT: ${OPENCART_PORT:-:8090}
+      OPENCART_PUBLIC_URL: ${OPENCART_PUBLIC_URL:-https://demo-oc.ivo.md}
       OPENCART_DATABASE_HOST: mariadb_opencart_demo
       OPENCART_DATABASE_USER: bn_opencart
       OPENCART_DATABASE_PASSWORD: ""

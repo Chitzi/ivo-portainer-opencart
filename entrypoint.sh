@@ -5,6 +5,8 @@ CONFIG_FILE="/var/www/html/config.php"
 ADMIN_CONFIG_FILE="/var/www/html/admin/config.php"
 OPENCART_HOST="${OPENCART_HOST:-localhost}"
 OPENCART_PORT="${OPENCART_PORT:-:8090}"
+OPENCART_PUBLIC_URL="${OPENCART_PUBLIC_URL:-http://${OPENCART_HOST}${OPENCART_PORT}}"
+OPENCART_PUBLIC_URL="${OPENCART_PUBLIC_URL%/}"
 OPENCART_DATABASE_HOST="${OPENCART_DATABASE_HOST:-mariadb_opencart_demo}"
 OPENCART_DATABASE_USER="${OPENCART_DATABASE_USER:-bn_opencart}"
 OPENCART_DATABASE_PASSWORD="${OPENCART_DATABASE_PASSWORD:-}"
@@ -13,8 +15,8 @@ OPENCART_DATABASE_NAME="${OPENCART_DATABASE_NAME:-bitnami_opencart}"
 generate_config() {
 cat <<EOF > "$CONFIG_FILE"
 <?php
-define('HTTP_SERVER', 'http://${OPENCART_HOST}${OPENCART_PORT}/');
-define('HTTPS_SERVER', 'http://${OPENCART_HOST}${OPENCART_PORT}/');
+define('HTTP_SERVER', '${OPENCART_PUBLIC_URL}/');
+define('HTTPS_SERVER', '${OPENCART_PUBLIC_URL}/');
 define('APPLICATION', 'Catalog');
 define('DIR_OPENCART', '/var/www/html/');
 define('DIR_APPLICATION', '/var/www/html/catalog/');
@@ -45,10 +47,10 @@ EOF
 generate_admin_config() {
 cat <<EOF > "$ADMIN_CONFIG_FILE"
 <?php
-define('HTTP_SERVER', 'http://${OPENCART_HOST}${OPENCART_PORT}/admin/');
-define('HTTP_CATALOG', 'http://${OPENCART_HOST}${OPENCART_PORT}/');
-define('HTTPS_SERVER', 'http://${OPENCART_HOST}${OPENCART_PORT}/admin/');
-define('HTTPS_CATALOG', 'http://${OPENCART_HOST}${OPENCART_PORT}/');
+define('HTTP_SERVER', '${OPENCART_PUBLIC_URL}/admin/');
+define('HTTP_CATALOG', '${OPENCART_PUBLIC_URL}/');
+define('HTTPS_SERVER', '${OPENCART_PUBLIC_URL}/admin/');
+define('HTTPS_CATALOG', '${OPENCART_PUBLIC_URL}/');
 define('APPLICATION', 'Admin');
 define('DIR_OPENCART', '/var/www/html/');
 define('DIR_APPLICATION', '/var/www/html/admin/');
@@ -76,17 +78,16 @@ define('OPENCART_SERVER', 'https://www.opencart.com/');
 EOF
 }
 
-if ! grep -q "APPLICATION.*Catalog" "$CONFIG_FILE" 2>/dev/null; then
-    echo "Generating catalog config.php..."
-    generate_config
-fi
+echo "Generating catalog config.php..."
+generate_config
 
-if ! grep -q "APPLICATION.*Admin" "$ADMIN_CONFIG_FILE" 2>/dev/null; then
-    echo "Generating admin/config.php..."
-    generate_admin_config
-fi
+echo "Generating admin/config.php..."
+generate_admin_config
 
 chown www-data:www-data "$CONFIG_FILE" "$ADMIN_CONFIG_FILE"
+
+find /var/www/html -type f \( -name '*.php' -o -name '*.twig' -o -name '*.css' -o -name '*.html' \) \
+    -exec sed -i 's#http://fonts.googleapis.com#https://fonts.googleapis.com#g' {} +
 
 echo "Waiting for MariaDB on ${OPENCART_DATABASE_HOST}:3306..."
 while ! timeout 2 bash -c "</dev/tcp/${OPENCART_DATABASE_HOST}/3306" 2>/dev/null; do
@@ -109,6 +110,6 @@ mysql --skip-ssl -h "${OPENCART_DATABASE_HOST}" -u "${OPENCART_DATABASE_USER}" "
 echo "Setting demo admin login..."
 mysql --skip-ssl -h "${OPENCART_DATABASE_HOST}" -u "${OPENCART_DATABASE_USER}" "${OPENCART_DATABASE_NAME}" -e "UPDATE oc_user SET username='admin', password=CONCAT(CHAR(36),'2y',CHAR(36),'12',CHAR(36),'aEvP0qBFmE0I2nxKXwUL6u5dI5NTt48dTzZz8G6t8yuSGvW3tGcC2'), firstname='Demo', lastname='Admin', email='admin@example.com', status=1 WHERE user_id=1;"
 
-echo "OpenCart demo is ready: http://${OPENCART_HOST}${OPENCART_PORT}/admin admin/admin123"
+echo "OpenCart demo is ready: ${OPENCART_PUBLIC_URL}/admin admin/admin123"
 
 exec docker-php-entrypoint "$@"

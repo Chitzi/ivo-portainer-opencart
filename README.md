@@ -6,8 +6,8 @@ Ready-to-use OpenCart demo stack for Portainer.
 
 Deploy `docker-compose.yml` in Portainer after publishing the images from GitHub Actions.
 
-- Storefront: http://localhost:8090
-- Admin: http://localhost:8090/admin
+- Storefront: https://demo-oc.ivo.md
+- Admin: https://demo-oc.ivo.md/admin
 - User: `admin`
 - Password: `admin123`
 
