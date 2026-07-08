@@ -69,3 +69,11 @@ WHERE NOT EXISTS (
     AND `pd`.`price` = `ps`.`price`
     AND `pd`.`special` = 1
 );
+
+-- The bundled dump marks voucher totals as installed, but OpenCart 4.1.0.3 no
+-- longer ships extension/opencart/catalog/model/total/voucher.php.
+DELETE FROM `oc_extension`
+WHERE `extension` = 'opencart' AND `type` = 'total' AND `code` = 'voucher';
+
+DELETE FROM `oc_setting`
+WHERE `code` = 'total_voucher';
