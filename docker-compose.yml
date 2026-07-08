@@ -44,6 +44,7 @@ services:
         if ! mariadb --skip-ssl -h mariadb_opencart_demo -u bn_opencart bitnami_opencart -e "SELECT 1 FROM oc_store LIMIT 1;" >/dev/null 2>&1; then
           mariadb --skip-ssl -h mariadb_opencart_demo -u bn_opencart bitnami_opencart < /dump.sql
         fi
+        mariadb --skip-ssl -h mariadb_opencart_demo -u bn_opencart bitnami_opencart < /db-patch.sql
         until mariadb --skip-ssl -h mariadb_opencart_demo -u bn_opencart bitnami_opencart -e "SELECT 1 FROM oc_user LIMIT 1;" >/dev/null 2>&1; do
           sleep 2
         done

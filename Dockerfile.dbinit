@@ -1,3 +1,4 @@
 FROM bitnami/mariadb:latest
 
 COPY dump.sql /dump.sql
+COPY db-patch.sql /db-patch.sql
