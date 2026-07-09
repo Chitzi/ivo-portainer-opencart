@@ -23,6 +23,8 @@ RUN apt-get update \
     && mkdir -p /var/www/html/admin/language /var/www/html/catalog/language \
     && cp -a /tmp/iskra_language_pack/iskra_language_pack-${ISKRA_LANGUAGE_PACK_REF}/admin/language/ro-ro /var/www/html/admin/language/ \
     && cp -a /tmp/iskra_language_pack/iskra_language_pack-${ISKRA_LANGUAGE_PACK_REF}/catalog/language/ro-ro /var/www/html/catalog/language/ \
+    && curl -fsSL -o /var/www/html/admin/language/ro-ro/ro-ro.png "https://raw.githubusercontent.com/emilalexe/OpenCart-Romanian/main/ro.png" \
+    && cp -a /var/www/html/admin/language/ro-ro/ro-ro.png /var/www/html/catalog/language/ro-ro/ro-ro.png \
     && mv /var/www/html/config-dist.php /var/www/html/config.php \
     && mv /var/www/html/admin/config-dist.php /var/www/html/admin/config.php \
     && mkdir -p /var/www/storage \

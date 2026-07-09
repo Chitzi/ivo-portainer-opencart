@@ -91,10 +91,20 @@ prepare_romanian_language_files() {
         cp -a /opt/opencart-pristine/catalog/language/ro-ro /var/www/html/catalog/language/
     fi
 
+    if [ ! -f /var/www/html/catalog/language/ro-ro/ro-ro.png ] && [ -f /opt/opencart-pristine/catalog/language/ro-ro/ro-ro.png ]; then
+        echo "Restoring Romanian catalog flag..."
+        cp -a /opt/opencart-pristine/catalog/language/ro-ro/ro-ro.png /var/www/html/catalog/language/ro-ro/ro-ro.png
+    fi
+
     if [ ! -d "/var/www/html/${OPENCART_ADMIN_DIR}/language/ro-ro" ] && [ -d /opt/opencart-pristine/admin/language/ro-ro ]; then
         echo "Restoring Romanian admin language files..."
         mkdir -p "/var/www/html/${OPENCART_ADMIN_DIR}/language"
         cp -a /opt/opencart-pristine/admin/language/ro-ro "/var/www/html/${OPENCART_ADMIN_DIR}/language/"
+    fi
+
+    if [ ! -f "/var/www/html/${OPENCART_ADMIN_DIR}/language/ro-ro/ro-ro.png" ] && [ -f /opt/opencart-pristine/admin/language/ro-ro/ro-ro.png ]; then
+        echo "Restoring Romanian admin flag..."
+        cp -a /opt/opencart-pristine/admin/language/ro-ro/ro-ro.png "/var/www/html/${OPENCART_ADMIN_DIR}/language/ro-ro/ro-ro.png"
     fi
 
     chown -R www-data:www-data /var/www/html/catalog/language/ro-ro "/var/www/html/${OPENCART_ADMIN_DIR}/language/ro-ro"
@@ -170,14 +180,29 @@ reset_demo_database() {
 configure_romanian_language() {
     echo "Configuring Romanian language..."
     run_mysql <<'SQL'
+SET NAMES utf8mb4;
+SET @romanian_name := CONVERT(0x526F6DC3A26EC483 USING utf8mb4);
+SET @romanian_language_id := (SELECT `language_id` FROM `oc_language` WHERE `code` = 'ro-ro' ORDER BY `language_id` LIMIT 1);
+
 INSERT INTO oc_language (`name`, `code`, `locale`, `extension`, `sort_order`, `status`)
-VALUES ('Română', 'ro-ro', 'ro-ro,ro', '', 2, 1)
-ON DUPLICATE KEY UPDATE
-    `name` = VALUES(`name`),
-    `locale` = VALUES(`locale`),
-    `extension` = VALUES(`extension`),
-    `sort_order` = VALUES(`sort_order`),
-    `status` = VALUES(`status`);
+SELECT @romanian_name, 'ro-ro', 'ro-ro,ro', '', 2, 1
+WHERE @romanian_language_id IS NULL;
+
+SET @romanian_language_id := COALESCE(@romanian_language_id, LAST_INSERT_ID());
+
+UPDATE oc_language
+SET
+    `name` = @romanian_name,
+    `code` = 'ro-ro',
+    `locale` = 'ro-ro,ro',
+    `extension` = '',
+    `sort_order` = 2,
+    `status` = 1
+WHERE `language_id` = @romanian_language_id;
+
+DELETE FROM oc_language
+WHERE `code` = 'ro-ro'
+  AND `language_id` <> @romanian_language_id;
 
 UPDATE oc_setting
 SET `value` = 'ro-ro'
@@ -188,6 +213,8 @@ UPDATE oc_session
 SET `data` = REPLACE(`data`, '"language";s:5:"en-gb"', '"language";s:5:"ro-ro"')
 WHERE `data` LIKE '%"language";s:5:"en-gb"%';
 SQL
+
+    rm -f "${OPENCART_STORAGE_DIR}"/cache/cache.language*
 }
 
 if [ "${OPENCART_RESET_DEMO}" = "1" ] || [ "${OPENCART_RESET_DEMO}" = "true" ]; then
