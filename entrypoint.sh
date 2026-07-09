@@ -46,6 +46,8 @@ if [ "${OPENCART_RESET_DEMO}" = "1" ] || [ "${OPENCART_RESET_DEMO}" = "true" ]; 
     restore_demo_files
 fi
 
+rm -rf /var/www/html/install
+
 generate_config() {
 cat <<EOF > "$CONFIG_FILE"
 <?php
