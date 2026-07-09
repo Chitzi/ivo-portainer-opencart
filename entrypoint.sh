@@ -298,9 +298,10 @@ elif ! run_mysql -e "SELECT 1 FROM oc_store LIMIT 1;" >/dev/null 2>&1; then
     run_mysql < /dump.sql
 fi
 
+configure_romanian_language
+
 echo "Reconciling OpenCart demo database schema..."
 run_mysql < /db-patch.sql
-configure_romanian_language
 
 echo "Setting demo admin login..."
 run_mysql -e "UPDATE oc_user SET username='admin', password=CONCAT(CHAR(36),'2y',CHAR(36),'12',CHAR(36),'aEvP0qBFmE0I2nxKXwUL6u5dI5NTt48dTzZz8G6t8yuSGvW3tGcC2'), firstname='Demo', lastname='Admin', email='admin@example.com', status=1 WHERE user_id=1;"
