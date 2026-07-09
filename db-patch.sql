@@ -47,6 +47,38 @@ ALTER TABLE `oc_theme`
 ALTER TABLE `oc_user_authorize`
   ADD COLUMN IF NOT EXISTS `date_expire` datetime AFTER `date_added`;
 
+ALTER TABLE `oc_country`
+  MODIFY COLUMN `name` varchar(128) NOT NULL DEFAULT '';
+
+ALTER TABLE `oc_zone`
+  MODIFY COLUMN `name` varchar(128) NOT NULL DEFAULT '';
+
+CREATE TABLE IF NOT EXISTS `oc_country_description` (
+  `country_id` int(11) NOT NULL,
+  `language_id` int(11) NOT NULL,
+  `name` varchar(128) NOT NULL,
+  PRIMARY KEY (`country_id`, `language_id`),
+  KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `oc_zone_description` (
+  `zone_id` int(11) NOT NULL,
+  `language_id` int(11) NOT NULL,
+  `name` varchar(128) NOT NULL,
+  PRIMARY KEY (`zone_id`, `language_id`),
+  KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+
+INSERT IGNORE INTO `oc_country_description` (`country_id`, `language_id`, `name`)
+SELECT `c`.`country_id`, `l`.`language_id`, `c`.`name`
+FROM `oc_country` `c`
+CROSS JOIN `oc_language` `l`;
+
+INSERT IGNORE INTO `oc_zone_description` (`zone_id`, `language_id`, `name`)
+SELECT `z`.`zone_id`, `l`.`language_id`, `z`.`name`
+FROM `oc_zone` `z`
+CROSS JOIN `oc_language` `l`;
+
 CREATE TABLE IF NOT EXISTS `oc_identifier` (
   `identifier_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
