@@ -84,6 +84,22 @@ prepare_storage_directory() {
     chown -R www-data:www-data "${OPENCART_STORAGE_DIR}"
 }
 
+prepare_romanian_language_files() {
+    if [ ! -d /var/www/html/catalog/language/ro-ro ] && [ -d /opt/opencart-pristine/catalog/language/ro-ro ]; then
+        echo "Restoring Romanian catalog language files..."
+        mkdir -p /var/www/html/catalog/language
+        cp -a /opt/opencart-pristine/catalog/language/ro-ro /var/www/html/catalog/language/
+    fi
+
+    if [ ! -d "/var/www/html/${OPENCART_ADMIN_DIR}/language/ro-ro" ] && [ -d /opt/opencart-pristine/admin/language/ro-ro ]; then
+        echo "Restoring Romanian admin language files..."
+        mkdir -p "/var/www/html/${OPENCART_ADMIN_DIR}/language"
+        cp -a /opt/opencart-pristine/admin/language/ro-ro "/var/www/html/${OPENCART_ADMIN_DIR}/language/"
+    fi
+
+    chown -R www-data:www-data /var/www/html/catalog/language/ro-ro "/var/www/html/${OPENCART_ADMIN_DIR}/language/ro-ro"
+}
+
 patch_admin_stylesheet() {
     local stylesheet="/var/www/html/${OPENCART_ADMIN_DIR}/view/stylesheet/stylesheet.css"
 
@@ -151,12 +167,36 @@ reset_demo_database() {
     run_mysql < /dump.sql
 }
 
+configure_romanian_language() {
+    echo "Configuring Romanian language..."
+    run_mysql <<'SQL'
+INSERT INTO oc_language (`name`, `code`, `locale`, `extension`, `sort_order`, `status`)
+VALUES ('Română', 'ro-ro', 'ro-ro,ro', '', 2, 1)
+ON DUPLICATE KEY UPDATE
+    `name` = VALUES(`name`),
+    `locale` = VALUES(`locale`),
+    `extension` = VALUES(`extension`),
+    `sort_order` = VALUES(`sort_order`),
+    `status` = VALUES(`status`);
+
+UPDATE oc_setting
+SET `value` = 'ro-ro'
+WHERE `code` = 'config'
+  AND `key` IN ('config_language', 'config_language_admin');
+
+UPDATE oc_session
+SET `data` = REPLACE(`data`, '"language";s:5:"en-gb"', '"language";s:5:"ro-ro"')
+WHERE `data` LIKE '%"language";s:5:"en-gb"%';
+SQL
+}
+
 if [ "${OPENCART_RESET_DEMO}" = "1" ] || [ "${OPENCART_RESET_DEMO}" = "true" ]; then
     restore_demo_files
 fi
 
 rm -rf /var/www/html/install
 prepare_admin_directory
+prepare_romanian_language_files
 prepare_storage_directory
 
 generate_config() {
@@ -260,6 +300,7 @@ fi
 
 echo "Reconciling OpenCart demo database schema..."
 run_mysql < /db-patch.sql
+configure_romanian_language
 
 echo "Setting demo admin login..."
 run_mysql -e "UPDATE oc_user SET username='admin', password=CONCAT(CHAR(36),'2y',CHAR(36),'12',CHAR(36),'aEvP0qBFmE0I2nxKXwUL6u5dI5NTt48dTzZz8G6t8yuSGvW3tGcC2'), firstname='Demo', lastname='Admin', email='admin@example.com', status=1 WHERE user_id=1;"
