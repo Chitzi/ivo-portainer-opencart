@@ -68,7 +68,8 @@ prepare_storage_directory() {
         rm -rf /var/www/html/system/storage
     fi
 
-    if [ ! -f "${OPENCART_STORAGE_DIR}/vendor.php" ] && [ -f /opt/opencart-storage-pristine/vendor.php ]; then
+    if [ ! -f "${OPENCART_STORAGE_DIR}/vendor/autoload.php" ] || [ ! -f "${OPENCART_STORAGE_DIR}/vendor/twig/twig/src/Loader/FilesystemLoader.php" ]; then
+        echo "Repairing OpenCart storage dependencies..."
         cp -a /opt/opencart-storage-pristine/. "${OPENCART_STORAGE_DIR}/"
     fi
 
