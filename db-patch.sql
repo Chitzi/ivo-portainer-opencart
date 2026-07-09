@@ -96,6 +96,16 @@ WHERE `extension` = 'opencart' AND `type` = 'total' AND `code` = 'voucher';
 DELETE FROM `oc_setting`
 WHERE `code` = 'total_voucher';
 
+DELETE FROM `oc_setting`
+WHERE `store_id` = 0
+  AND `code` = 'config'
+  AND `key` IN ('config_image_default_width', 'config_image_default_height');
+
+INSERT INTO `oc_setting` (`store_id`, `code`, `key`, `value`, `serialized`)
+VALUES
+  (0, 'config', 'config_image_default_width', '100', 0),
+  (0, 'config', 'config_image_default_height', '100', 0);
+
 -- IVO demo hero product: Samsung Galaxy Z Fold7 with Color and Memory variants.
 SET @ro_language_id := (SELECT `language_id` FROM `oc_language` WHERE `code` = 'ro-ro' LIMIT 1);
 
