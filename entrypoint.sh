@@ -83,6 +83,67 @@ prepare_storage_directory() {
     chown -R www-data:www-data "${OPENCART_STORAGE_DIR}"
 }
 
+patch_admin_stylesheet() {
+    local stylesheet="/var/www/html/${OPENCART_ADMIN_DIR}/view/stylesheet/stylesheet.css"
+
+    if [ ! -f "${stylesheet}" ] || grep -q "IVO demo overflow patch" "${stylesheet}"; then
+        return
+    fi
+
+    cat <<'EOF' >> "${stylesheet}"
+
+/* IVO demo overflow patch */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+#container,
+#content,
+#content .container-fluid,
+#content .card {
+    min-width: 0;
+    max-width: 100%;
+}
+
+#content {
+    width: auto;
+    overflow-x: hidden;
+}
+
+#content .table-responsive {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+#content .table-responsive > .table {
+    margin-bottom: 0;
+}
+
+#content .float-end,
+#content .text-end {
+    white-space: nowrap;
+}
+
+@media (min-width: 992px) {
+    #column-left + #content,
+    #column-left + #content + #footer,
+    #column-left.active + #content,
+    #column-left.active + #content + #footer {
+        width: calc(100% - 235px);
+        max-width: calc(100% - 235px);
+    }
+}
+
+@media (max-width: 991.98px) {
+    #column-left.active + #content,
+    #column-left.active + #content + #footer {
+        left: 0;
+    }
+}
+EOF
+}
+
 reset_demo_database() {
     echo "Resetting OpenCart database from bundled demo dump..."
     run_mysql -Nse "SET FOREIGN_KEY_CHECKS=0; SELECT CONCAT('DROP ', IF(TABLE_TYPE = 'VIEW', 'VIEW', 'TABLE'), ' IF EXISTS \`', TABLE_NAME, '\`;') FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE(); SET FOREIGN_KEY_CHECKS=1;" | run_mysql
@@ -173,6 +234,11 @@ chown www-data:www-data "$CONFIG_FILE" "$ADMIN_CONFIG_FILE"
 
 find /var/www/html -type f \( -name '*.php' -o -name '*.twig' -o -name '*.css' -o -name '*.html' \) \
     -exec sed -i 's#http://fonts.googleapis.com#https://fonts.googleapis.com#g' {} +
+
+patch_admin_stylesheet
+if [ -f "/var/www/html/${OPENCART_ADMIN_DIR}/view/stylesheet/stylesheet.css" ]; then
+    chown www-data:www-data "/var/www/html/${OPENCART_ADMIN_DIR}/view/stylesheet/stylesheet.css"
+fi
 
 echo "Waiting for MariaDB on ${OPENCART_DATABASE_HOST}:3306..."
 while ! timeout 2 bash -c "</dev/tcp/${OPENCART_DATABASE_HOST}/3306" 2>/dev/null; do
