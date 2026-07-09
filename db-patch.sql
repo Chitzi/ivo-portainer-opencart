@@ -296,11 +296,266 @@ REPLACE INTO `oc_product_option_value` (
   (777004, 77702, 777, 778, 7781, 75, 1, 0.0000, '+', 0, '+', 0.00000000, '+'),
   (777005, 77702, 777, 778, 7782, 75, 1, 200.0000, '+', 0, '+', 0.00000000, '+');
 
+-- Additional IVO demo products: Galaxy Z Flip7 and Galaxy S26 Ultra.
+REPLACE INTO `oc_option` (`option_id`, `type`, `validation`, `sort_order`)
+VALUES
+  (779, 'radio', '', 3),
+  (780, 'radio', '', 4),
+  (781, 'radio', '', 5),
+  (782, 'radio', '', 6);
+
+REPLACE INTO `oc_option_description` (`option_id`, `language_id`, `name`)
+VALUES
+  (779, 1, 'Color'),
+  (780, 1, 'Memory'),
+  (781, 1, 'Color'),
+  (782, 1, 'Memory');
+
+INSERT INTO `oc_option_description` (`option_id`, `language_id`, `name`)
+SELECT 779, @ro_language_id, 'Culoare'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
+INSERT INTO `oc_option_description` (`option_id`, `language_id`, `name`)
+SELECT 780, @ro_language_id, 'Memorie'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
+INSERT INTO `oc_option_description` (`option_id`, `language_id`, `name`)
+SELECT 781, @ro_language_id, 'Culoare'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
+INSERT INTO `oc_option_description` (`option_id`, `language_id`, `name`)
+SELECT 782, @ro_language_id, 'Memorie'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
+REPLACE INTO `oc_option_value` (`option_value_id`, `option_id`, `image`, `sort_order`)
+VALUES
+  (7791, 779, '', 1),
+  (7792, 779, '', 2),
+  (7793, 779, '', 3),
+  (7801, 780, '', 1),
+  (7802, 780, '', 2),
+  (7811, 781, '', 1),
+  (7812, 781, '', 2),
+  (7813, 781, '', 3),
+  (7821, 782, '', 1),
+  (7822, 782, '', 2),
+  (7823, 782, '', 3);
+
+REPLACE INTO `oc_option_value_description` (`option_value_id`, `language_id`, `option_id`, `name`)
+VALUES
+  (7791, 1, 779, 'Jetblack'),
+  (7792, 1, 779, 'Blue Shadow'),
+  (7793, 1, 779, 'Coral Red'),
+  (7801, 1, 780, '12GB + 256GB'),
+  (7802, 1, 780, '12GB + 512GB'),
+  (7811, 1, 781, 'Titanium Black'),
+  (7812, 1, 781, 'Titanium Gray'),
+  (7813, 1, 781, 'Titanium Silver Blue'),
+  (7821, 1, 782, '12GB + 256GB'),
+  (7822, 1, 782, '12GB + 512GB'),
+  (7823, 1, 782, '16GB + 1TB');
+
+INSERT INTO `oc_option_value_description` (`option_value_id`, `language_id`, `option_id`, `name`)
+SELECT 7791, @ro_language_id, 779, 'Jetblack'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
+INSERT INTO `oc_option_value_description` (`option_value_id`, `language_id`, `option_id`, `name`)
+SELECT 7792, @ro_language_id, 779, 'Blue Shadow'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
+INSERT INTO `oc_option_value_description` (`option_value_id`, `language_id`, `option_id`, `name`)
+SELECT 7793, @ro_language_id, 779, 'Coral Red'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
+INSERT INTO `oc_option_value_description` (`option_value_id`, `language_id`, `option_id`, `name`)
+SELECT 7801, @ro_language_id, 780, '12GB + 256GB'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
+INSERT INTO `oc_option_value_description` (`option_value_id`, `language_id`, `option_id`, `name`)
+SELECT 7802, @ro_language_id, 780, '12GB + 512GB'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
+INSERT INTO `oc_option_value_description` (`option_value_id`, `language_id`, `option_id`, `name`)
+SELECT 7811, @ro_language_id, 781, 'Titanium Black'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
+INSERT INTO `oc_option_value_description` (`option_value_id`, `language_id`, `option_id`, `name`)
+SELECT 7812, @ro_language_id, 781, 'Titanium Gray'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
+INSERT INTO `oc_option_value_description` (`option_value_id`, `language_id`, `option_id`, `name`)
+SELECT 7813, @ro_language_id, 781, 'Titanium Silver Blue'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
+INSERT INTO `oc_option_value_description` (`option_value_id`, `language_id`, `option_id`, `name`)
+SELECT 7821, @ro_language_id, 782, '12GB + 256GB'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
+INSERT INTO `oc_option_value_description` (`option_value_id`, `language_id`, `option_id`, `name`)
+SELECT 7822, @ro_language_id, 782, '12GB + 512GB'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
+INSERT INTO `oc_option_value_description` (`option_value_id`, `language_id`, `option_id`, `name`)
+SELECT 7823, @ro_language_id, 782, '16GB + 1TB'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
+REPLACE INTO `oc_product` (
+  `product_id`, `master_id`, `model`, `sku`, `upc`, `ean`, `jan`, `isbn`, `mpn`, `location`,
+  `variant`, `override`, `quantity`, `stock_status_id`, `image`, `manufacturer_id`, `shipping`,
+  `price`, `points`, `tax_class_id`, `date_available`, `weight`, `weight_class_id`, `length`,
+  `width`, `height`, `length_class_id`, `subtract`, `minimum`, `rating`, `sort_order`, `status`,
+  `date_added`, `date_modified`
+) VALUES
+  (
+    778, 0, 'SM-F766B', 'ZFLIP7-12-256-JB', '', '', '', '', '', '',
+    '', '', 100, 7, 'catalog/demo/samsung_tab_2.jpg', 777, 1,
+    1099.9900, 0, 9, CURDATE(), 0.18800000, 1, 165.10000000,
+    71.90000000, 6.90000000, 1, 1, 1, 0, -99, 1,
+    NOW(), NOW()
+  ),
+  (
+    779, 0, 'SM-S948B', 'S26U-12-256-TB', '', '', '', '', '', '',
+    '', '', 100, 7, 'catalog/demo/samsung_tab_3.jpg', 777, 1,
+    1299.9900, 0, 9, CURDATE(), 0.23200000, 1, 162.30000000,
+    79.00000000, 8.60000000, 1, 1, 1, 0, -98, 1,
+    NOW(), NOW()
+  );
+
+SET @flip7_description := '<p><strong>Samsung Galaxy Z Flip7 AI Foldable Smartphone</strong> with compact foldable design, bright main display, Galaxy AI tools, dual-camera system, and all-day battery.</p><p>Designed for pocketable style and hands-free creativity, Galaxy Z Flip7 opens into a full smartphone experience and folds down for quick capture, calls, and content previews.</p><ul><li>Compact AI foldable smartphone</li><li>12GB RAM with 256GB or 512GB storage variants</li><li>Jetblack, Blue Shadow, and Coral Red color variants</li><li>Large cover screen for quick actions</li><li>Dual-camera system for photos, video, and selfies</li></ul>';
+SET @s26_ultra_description := '<p><strong>Samsung Galaxy S26 Ultra AI Smartphone</strong> with premium titanium-inspired design, Galaxy AI performance, advanced camera system, long-lasting battery, and pro-grade display.</p><p>Built for creators and power users, Galaxy S26 Ultra combines flagship speed, high-capacity storage options, and a refined Ultra design for work, content, and everyday productivity.</p><ul><li>Flagship AI smartphone</li><li>12GB or 16GB RAM storage variants up to 1TB</li><li>Titanium Black, Titanium Gray, and Titanium Silver Blue color variants</li><li>Advanced multi-camera system</li><li>Large high-refresh display for video and productivity</li></ul>';
+
+REPLACE INTO `oc_product_description` (`product_id`, `language_id`, `name`, `description`, `tag`, `meta_title`, `meta_description`, `meta_keyword`)
+VALUES
+  (
+    778, 1,
+    'Samsung Galaxy Z Flip7 AI Foldable Smartphone',
+    @flip7_description,
+    'Samsung, Galaxy Z Flip7, foldable, AI smartphone',
+    'Samsung Galaxy Z Flip7 AI Foldable Smartphone',
+    'Samsung Galaxy Z Flip7 compact AI foldable smartphone with Color and Memory variants.',
+    'Samsung Galaxy Z Flip7, foldable smartphone, AI phone'
+  ),
+  (
+    779, 1,
+    'Samsung Galaxy S26 Ultra AI Smartphone',
+    @s26_ultra_description,
+    'Samsung, Galaxy S26 Ultra, AI smartphone, Ultra',
+    'Samsung Galaxy S26 Ultra AI Smartphone',
+    'Samsung Galaxy S26 Ultra flagship AI smartphone with Color and Memory variants up to 1TB.',
+    'Samsung Galaxy S26 Ultra, AI smartphone, flagship phone'
+  );
+
+INSERT INTO `oc_product_description` (`product_id`, `language_id`, `name`, `description`, `tag`, `meta_title`, `meta_description`, `meta_keyword`)
+SELECT
+  778, @ro_language_id,
+  'Samsung Galaxy Z Flip7 AI Foldable Smartphone',
+  @flip7_description,
+  'Samsung, Galaxy Z Flip7, foldable, AI smartphone',
+  'Samsung Galaxy Z Flip7 AI Foldable Smartphone',
+  'Samsung Galaxy Z Flip7 compact AI foldable smartphone with Color and Memory variants.',
+  'Samsung Galaxy Z Flip7, foldable smartphone, AI phone'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE
+  `name` = VALUES(`name`),
+  `description` = VALUES(`description`),
+  `tag` = VALUES(`tag`),
+  `meta_title` = VALUES(`meta_title`),
+  `meta_description` = VALUES(`meta_description`),
+  `meta_keyword` = VALUES(`meta_keyword`);
+
+INSERT INTO `oc_product_description` (`product_id`, `language_id`, `name`, `description`, `tag`, `meta_title`, `meta_description`, `meta_keyword`)
+SELECT
+  779, @ro_language_id,
+  'Samsung Galaxy S26 Ultra AI Smartphone',
+  @s26_ultra_description,
+  'Samsung, Galaxy S26 Ultra, AI smartphone, Ultra',
+  'Samsung Galaxy S26 Ultra AI Smartphone',
+  'Samsung Galaxy S26 Ultra flagship AI smartphone with Color and Memory variants up to 1TB.',
+  'Samsung Galaxy S26 Ultra, AI smartphone, flagship phone'
+WHERE @ro_language_id IS NOT NULL
+ON DUPLICATE KEY UPDATE
+  `name` = VALUES(`name`),
+  `description` = VALUES(`description`),
+  `tag` = VALUES(`tag`),
+  `meta_title` = VALUES(`meta_title`),
+  `meta_description` = VALUES(`meta_description`),
+  `meta_keyword` = VALUES(`meta_keyword`);
+
+REPLACE INTO `oc_product_to_category` (`product_id`, `category_id`)
+VALUES
+  (778, 24),
+  (779, 24);
+
+REPLACE INTO `oc_product_to_store` (`product_id`, `store_id`)
+VALUES
+  (778, 0),
+  (779, 0);
+
+DELETE FROM `oc_product_image`
+WHERE `product_id` IN (778, 779);
+
+INSERT INTO `oc_product_image` (`product_id`, `image`, `sort_order`)
+VALUES
+  (778, 'catalog/demo/samsung_tab_1.jpg', 1),
+  (778, 'catalog/demo/samsung_tab_3.jpg', 2),
+  (778, 'catalog/demo/samsung_tab_4.jpg', 3),
+  (779, 'catalog/demo/samsung_tab_1.jpg', 1),
+  (779, 'catalog/demo/samsung_tab_2.jpg', 2),
+  (779, 'catalog/demo/samsung_tab_4.jpg', 3);
+
+DELETE FROM `oc_product_option_value`
+WHERE `product_id` IN (778, 779);
+
+DELETE FROM `oc_product_option`
+WHERE `product_id` IN (778, 779);
+
+REPLACE INTO `oc_product_option` (`product_option_id`, `product_id`, `option_id`, `value`, `required`)
+VALUES
+  (77801, 778, 779, '', 1),
+  (77802, 778, 780, '', 1),
+  (77901, 779, 781, '', 1),
+  (77902, 779, 782, '', 1);
+
+REPLACE INTO `oc_product_option_value` (
+  `product_option_value_id`, `product_option_id`, `product_id`, `option_id`, `option_value_id`,
+  `quantity`, `subtract`, `price`, `price_prefix`, `points`, `points_prefix`, `weight`, `weight_prefix`
+) VALUES
+  (778001, 77801, 778, 779, 7791, 50, 1, 0.0000, '+', 0, '+', 0.00000000, '+'),
+  (778002, 77801, 778, 779, 7792, 50, 1, 0.0000, '+', 0, '+', 0.00000000, '+'),
+  (778003, 77801, 778, 779, 7793, 50, 1, 0.0000, '+', 0, '+', 0.00000000, '+'),
+  (778004, 77802, 778, 780, 7801, 75, 1, 0.0000, '+', 0, '+', 0.00000000, '+'),
+  (778005, 77802, 778, 780, 7802, 75, 1, 150.0000, '+', 0, '+', 0.00000000, '+'),
+  (779001, 77901, 779, 781, 7811, 50, 1, 0.0000, '+', 0, '+', 0.00000000, '+'),
+  (779002, 77901, 779, 781, 7812, 50, 1, 0.0000, '+', 0, '+', 0.00000000, '+'),
+  (779003, 77901, 779, 781, 7813, 50, 1, 0.0000, '+', 0, '+', 0.00000000, '+'),
+  (779004, 77902, 779, 782, 7821, 75, 1, 0.0000, '+', 0, '+', 0.00000000, '+'),
+  (779005, 77902, 779, 782, 7822, 75, 1, 200.0000, '+', 0, '+', 0.00000000, '+'),
+  (779006, 77902, 779, 782, 7823, 30, 1, 500.0000, '+', 0, '+', 0.00000000, '+');
+
 REPLACE INTO `oc_seo_url` (`seo_url_id`, `store_id`, `language_id`, `key`, `value`, `keyword`, `sort_order`)
 VALUES
   (7771, 0, 1, 'product_id', '777', 'samsung-galaxy-z-fold7', 1),
-  (7772, 0, COALESCE(@ro_language_id, 1), 'product_id', '777', 'samsung-galaxy-z-fold7-ro', 1);
+  (7772, 0, COALESCE(@ro_language_id, 1), 'product_id', '777', 'samsung-galaxy-z-fold7-ro', 1),
+  (7781, 0, 1, 'product_id', '778', 'samsung-galaxy-z-flip7', 1),
+  (7782, 0, COALESCE(@ro_language_id, 1), 'product_id', '778', 'samsung-galaxy-z-flip7-ro', 1),
+  (7791, 0, 1, 'product_id', '779', 'samsung-galaxy-s26-ultra', 1),
+  (7792, 0, COALESCE(@ro_language_id, 1), 'product_id', '779', 'samsung-galaxy-s26-ultra-ro', 1);
 
 UPDATE `oc_module`
-SET `setting` = '{"name":"Featured","product_name":"","product":["777","43","40","42"],"axis":"horizontal","limit":"4","width":"200","height":"200","status":"1"}'
+SET `setting` = '{"name":"Featured","product_name":"","product":["777","778","779","43"],"axis":"horizontal","limit":"4","width":"200","height":"200","status":"1"}'
 WHERE `code` = 'opencart.featured';
