@@ -6,6 +6,8 @@ services:
       - "8090:80"
     environment:
       OPENCART_PUBLIC_URL: ${OPENCART_PUBLIC_URL:-https://demo-oc.ivo.md}
+      OPENCART_ADMIN_DIR: ${OPENCART_ADMIN_DIR:-admin_ivo}
+      OPENCART_STORAGE_DIR: ${OPENCART_STORAGE_DIR:-/var/www/storage}
       OPENCART_RESET_DEMO: ${OPENCART_RESET_DEMO:-0}
       OPENCART_DATABASE_HOST: mariadb_opencart_demo
       OPENCART_DATABASE_USER: bn_opencart
@@ -13,6 +15,7 @@ services:
       OPENCART_DATABASE_NAME: bitnami_opencart
     volumes:
       - opencart_demo_data:/var/www/html
+      - opencart_storage_data:/var/www/storage
     depends_on:
       - mariadb_opencart_demo
     restart: unless-stopped
@@ -30,4 +33,5 @@ services:
 
 volumes:
   opencart_demo_data:
+  opencart_storage_data:
   mariadb_opencart_demo_data:

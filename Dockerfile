@@ -19,10 +19,16 @@ RUN apt-get update \
     && if [ -d "/tmp/opencart/upload" ]; then mv /tmp/opencart/upload/* /var/www/html/; else mv /tmp/opencart/*/upload/* /var/www/html/; fi \
     && mv /var/www/html/config-dist.php /var/www/html/config.php \
     && mv /var/www/html/admin/config-dist.php /var/www/html/admin/config.php \
+    && mkdir -p /var/www/storage \
+    && cp -a /var/www/html/system/storage/. /var/www/storage/ \
     && rm -rf /var/www/html/install \
+    && rm -rf /var/www/html/system/storage \
     && chown -R www-data:www-data /var/www/html \
+    && chown -R www-data:www-data /var/www/storage \
     && mkdir -p /opt/opencart-pristine \
+    && mkdir -p /opt/opencart-storage-pristine \
     && cp -a /var/www/html/. /opt/opencart-pristine/ \
+    && cp -a /var/www/storage/. /opt/opencart-storage-pristine/ \
     && rm -rf /var/lib/apt/lists/* /tmp/opencart /tmp/opencart.zip
 
 COPY dump.sql /dump.sql
